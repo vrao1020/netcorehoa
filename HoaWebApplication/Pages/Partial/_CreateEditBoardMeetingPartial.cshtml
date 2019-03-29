@@ -1,0 +1,55 @@
+﻿@using HoaWebApplication.Pages.BoardMeeting
+@model BoardMeetingsModel
+
+@if (TempData["TooManyRequests"] != null)
+{
+    <br />
+    <div class="alert alert-danger">@TempData["TooManyRequests"]</div>
+}
+else if (TempData["Error"] != null)
+{
+    <br />
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+else
+{
+    <form class="vn" asp-page="/BoardMeeting/BoardMeetings" asp-page-handler="@(Model.EditMeeting ? "EditMeeting" : "CreateMeeting")">
+        @**Below hidden input field is required because the AJAX post requires something
+            to verify if the submission was successful*@
+        <input name="IsValid" type="hidden" value="@ViewData.ModelState.IsValid.ToString()" />
+
+        @if (Model.EditMeeting)
+        {
+            <input type="hidden" asp-for="Id" value="@Model?.boardMeeting.Id" />
+        }
+        <div class="form-group">
+            <label asp-for="MeetingToCreateEdit.Title" class="control-label"></label>
+            <input asp-for="MeetingToCreateEdit.Title" value="@(Model.EditMeeting ? Model?.boardMeeting.Title : Model?.MeetingToCreateEdit.Title)"
+                   class="form-control" placeholder="Meeting Name" />
+            <span asp-validation-for="MeetingToCreateEdit.Title" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="MeetingToCreateEdit.ScheduledLocation" class="control-label"></label>
+            <input asp-for="MeetingToCreateEdit.ScheduledLocation" value="@(Model.EditMeeting ? Model?.boardMeeting.ScheduledLocation : Model?.MeetingToCreateEdit.ScheduledLocation)"
+                   class="form-control" placeholder="Meeting Location" />
+            <span asp-validation-for="MeetingToCreateEdit.ScheduledLocation" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="MeetingToCreateEdit.Description"></label>
+            <textarea asp-for="MeetingToCreateEdit.Description" class="form-control" id="tinymcetextarea"></textarea>
+            <input type="hidden" id="text-area-content" value="@(Model.EditMeeting ? Model.boardMeeting.Description : Model?.MeetingToCreateEdit.Description)" />
+            <span asp-validation-for="MeetingToCreateEdit.Description" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="MeetingToCreateEdit.ScheduledTime" class="control-label"></label>
+            <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
+                <input asp-for="MeetingToCreateEdit.ScheduledTime" value="@(Model.EditMeeting ? Model?.boardMeeting.ScheduledTime : DateTime.Now)"
+                       class="form-control datetimepicker-input" data-target="#datetimepicker1" />
+                <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                </div>
+            </div>
+            <span asp-validation-for="MeetingToCreateEdit.ScheduledTime" class="text-danger"></span>
+        </div>
+    </form>
+}

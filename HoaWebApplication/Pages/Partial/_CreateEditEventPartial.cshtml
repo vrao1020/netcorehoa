@@ -1,0 +1,56 @@
+﻿@using HoaWebApplication.Pages.Event
+@model EventsModel
+
+@if (TempData["TooManyRequests"] != null)
+{
+    <br />
+    <div class="alert alert-danger">@TempData["TooManyRequests"]</div>
+}
+else if (TempData["Error"] != null)
+{
+    <br />
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+else
+{
+    <form class="vn" asp-page="/Event/Events" asp-page-handler="@(Model.EditEvent ? "EditEvent" : "CreateEvent")" enctype="multipart/form-data">
+        @**Below hidden input field is required because the AJAX post requires something
+            to verify if the submission was successful*@
+        <input name="IsValid" type="hidden" value="@ViewData.ModelState.IsValid.ToString()" />
+
+        @if (Model.EditEvent)
+        {
+            <input type="hidden" asp-for="Id" value="@Model.eventForView.Id" />
+        }
+        <div class="form-group">
+            <label asp-for="EventToCreateEdit.Title" class="control-label"></label>
+            <input asp-for="EventToCreateEdit.Title" value="@(Model.EditEvent ? Model.eventForView.Title : Model.EventToCreateEdit.Title)"
+                   class="form-control" placeholder="Event Title" />
+            <span asp-validation-for="EventToCreateEdit.Title" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="EventToCreateEdit.Message" class="control-label"></label>
+            <textarea asp-for="EventToCreateEdit.Message" class="form-control" id="tinymcetextarea"></textarea>
+            <input type="hidden" id="text-area-content" value="@(Model.EditEvent ? Model.eventForView.Message : Model.EventToCreateEdit.Message)" />
+            <span asp-validation-for="EventToCreateEdit.Message" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="EventToCreateEdit.ScheduledTime" class="control-label"></label>
+            <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
+                <input asp-for="EventToCreateEdit.ScheduledTime" value="@(Model.EditEvent ? Model.eventForView.ScheduledTime : DateTime.Now)" class="form-control datetimepicker-input" data-target="#datetimepicker1" />
+                <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                </div>
+            </div>
+            <span asp-validation-for="EventToCreateEdit.ScheduledTime" class="text-danger"></span>
+        </div>
+        <div class="custom-file">
+            <input asp-for="ImageUploaded.FileToUpload" type="file" class="custom-file-input" accept=".png,.jpg,.bmp" aria-describedby="helptext" id="customFile" /><br />
+            <label class="custom-file-label" for="customFile">Choose file</label>
+            <span asp-validation-for="ImageUploaded.FileToUpload" class="text-danger"></span>
+            <small id="helptext" class="form-text text-muted">
+                File is optional, must be an image, and size must be smaller than 2MB.
+            </small>
+        </div>
+    </form>
+}

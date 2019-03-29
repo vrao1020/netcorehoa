@@ -1,0 +1,118 @@
+﻿@page "/Posts/{postId:Guid}/Comments/{pageNum:int?}"
+@model CommentsModel
+@{
+    ViewData["Title"] = "Comments";
+}
+
+@if (TempData["TooManyRequests"] != null)
+{
+    <div class="alert alert-danger">@TempData["TooManyRequests"]</div>
+}
+else if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+else
+{
+    <h1 class="display-4 text-primary bottom-border">Comments</h1>
+
+    <div class="row mb-2">
+        <div class="col">
+            <div class="card flex-md-row mb-4 box-shadow shadow-sm">
+                <div class="card-body d-flex flex-column align-items-start">
+                    <div class="d-flex flex-row">
+                        <h3 class="mb-0">
+                            <span class="text-dark">@Model.PostForView.Title</span>
+                        </h3>
+                    </div>
+                    @if (Model.PostForView.Important == true)
+                    {
+                        <div class="mb-1 badge badge-danger">Important!</div>
+                    }
+                    <div class="card-text mb-auto dont-break-out">@Html.Raw(@Model.PostForView.Message)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="list-group">
+        @{
+            var x = 0;
+            var id = User?.GetUserId();
+        }
+        @foreach (var item in Model.CommentsForView)
+        {
+            <div>
+                @{
+                    x = x + 1;
+                }
+            </div>
+
+            <div class="list-group-item list-group-item-action flex-column align-items-start @(x%2==1 ? "list-group-item-light" : "list-group-item-secondary")">
+                <p class="mb-1">@Html.Raw(@item.Message)</p>
+                <div class="d-flex w-100 justify-content-between">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <small>@item.OwnerName</small>
+                    }
+                    <div class="d-flex flex-row">
+                        <small>@item.DaysOld days ago</small>
+                        <div class="ml-1">
+                            @if ((User.Identity.IsAuthenticated) && (Model.UserIsAdmin || (User?.IsObjectOwner(id, item.OwnerSocialId) ?? false)))
+                            {
+                                <div class="d-flex">
+                                    <small>
+                                        <a class="text-dark show-cursor"
+                                           data-toggle="tooltip" data-placement="top" title="Edit Comment"
+                                           data-modal="create-edit-modal"
+                                           data-url="@Url.Page("/Post/Comment/Comments","FetchEditCommentPartial", new {Id = item.Id, PostId = Model.PostForView.Id})">
+                                            <i class="fa fa-pencil-square-o" aria-label="Edit" aria-hidden="true"></i>
+                                        </a>
+                                        <a class="text-danger show-cursor"
+                                           data-toggle="tooltip" data-placement="top" title="Delete Comment"
+                                           data-modal="delete-modal"
+                                           data-id="@item.Id"
+                                           data-parentId="@Model.PostForView.Id">
+                                            <i class="fa fa-trash" aria-label="Delete" aria-hidden="true"></i>
+                                        </a>
+                                    </small>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (User.IsAdministrator() || User.HasPostCreationAccess())
+    {
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-dark btn-sm mb-2 mt-1 ml-0" data-modal="create-edit-modal"
+                data-url="@Url.Page("/Post/Comment/Comments","FetchCreateCommentPartial")">
+            <small class="text-success">Add Comment <i class="fa fa-plus" aria-hidden="true"></i></small>
+        </button>
+    }
+
+    <pagination x-pagination-dto="Model.XPaginationDto" route-url="/Posts"></pagination>
+    <page-size x-pagination-dto="Model.XPaginationDto"></page-size>
+
+    <div class="deleteItem" hidden>
+        <p>You won't be able to undo this!</p>
+        <form class="deleteForm" asp-page="/Post/Comment/Comments" asp-page-handler="DeleteComment" method="post">
+            <input id="deleteId" type="hidden" asp-for="Id" />
+            <input id="deleteParentId" type="hidden" asp-for="PostId" />
+        </form>
+    </div>
+}
+
+@section Scripts {
+    @*initialize bootstrap tooltips and ensure they are configured to only work on hover
+        if trigger: hover is not enabled, button will be focused and tooltip won't dissapear after button click*@
+    <script type="text/javascript">
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip({
+                trigger: 'hover'
+            })
+        })
+    </script>
+}

@@ -1,0 +1,167 @@
+﻿@page "/BoardMeetings/{pageNum:int?}"
+@model BoardMeetingsModel
+@{
+    ViewData["Title"] = "Board Meetings";
+}
+
+@if (TempData["TooManyRequests"] != null)
+{
+    <div class="alert alert-danger">@TempData["TooManyRequests"]</div>
+}
+else if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+else
+{
+    <h1 class="display-4 text-primary bottom-border">Board Meetings</h1>
+
+    <table id="sort-table" class="table table-hover table-responsive-md">
+        <thead class="thead-dark">
+            <tr>
+                <th class="text-center align-middle">Name</th>
+                <th class="text-center align-middle col-4">Agenda</th>
+                <th class="text-center align-middle col-2">Location</th>
+                <th class="text-center align-middle">Date/Time</th>
+                <th class="text-center align-middle">Meeting Minute</th>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <th class="text-center align-middle">Edit</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.boardMeetings)
+            {
+                <tr>
+                    @*initialize local variable to store user is so that its not fetched repeatedly*@
+                    @{var id = User?.GetUserId();}
+                    <td class="text-center">@item.Title</td>
+                    <td class="text-center"><div class="dont-break-out">@Html.Raw(@item.Description)</div></td>
+                    <td class="text-center">@item.ScheduledLocation</td>
+                    <td class="text-center">@(item.ScheduledTime.ToString("MMMM dd, yyyy hh:mm tt", CultureInfo.InvariantCulture))</td>
+                    <td class="text-center">
+                        <div class="d-md-flex flex-md-row flex-sm-column d-sm-block justify-content-center">
+                            <span>
+                                @if (item.FileName != null)
+                                {
+                                    <a class="nav-link pr-1 pt-0" asp-page-handler="Download" asp-route-fileName="@item.FileName">@item.FileName</a>
+                                }
+                                else
+                                {
+                                    <span class="mr-1 text-muted">Notes coming soon</span>
+                                }
+                            </span>
+                            <div class="mb-auto">
+                                @if ((User.Identity.IsAuthenticated) && (Model.UserIsAdmin || (User?.IsObjectOwner(id, item.OwnerSocialId) ?? false)))
+                                {
+                                    <div>
+                                        <a class="text-dark show-cursor"
+                                           data-toggle="tooltip" data-placement="top" title="Upload Meeting Minute"
+                                           data-modal="create-edit-modal"
+                                           data-url="@Url.Page("/BoardMeeting/BoardMeetings","FetchUploadMeetingMinutePartial", new {Id = item.Id})">
+                                            <i class="fa fa-upload" aria-label="Upload" aria-hidden="true"></i>
+                                        </a>
+                                        @if (item.FileName != null)
+                                        {
+                                            <a class="text-danger show-cursor"
+                                               data-toggle="tooltip" data-placement="top" title="Delete Meeting Minute"
+                                               data-modal="delete-modal"
+                                               data-deleteRelated="true"
+                                               data-id="@item.MeetingMinuteId">
+                                                <i class="fa fa-trash" aria-label="Delete" aria-hidden="true"></i>
+                                            </a>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </td>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <td class="text-center">
+                            <div class="d-flex flex-column">
+                                @if ((Model.UserIsAdmin || (User?.IsObjectOwner(id, item.OwnerSocialId) ?? false)))
+                                {
+                                    <div>
+                                        <a class="text-dark show-cursor"
+                                           data-toggle="tooltip" data-placement="top" title="Edit Board Meeting"
+                                           data-modal="create-edit-modal"
+                                           data-url="@Url.Page("/BoardMeeting/BoardMeetings","FetchEditBoardMeetingPartial", new {Id = item.Id})">
+                                            <i class="fa fa-pencil-square-o" aria-label="Edit" aria-hidden="true"></i>
+                                        </a>
+                                        <a class="text-danger show-cursor"
+                                           data-toggle="tooltip" data-placement="top" title="Delete Board Meeting"
+                                           data-modal="delete-modal"
+                                           data-id="@item.Id">
+                                            <i class="fa fa-trash" aria-label="Delete" aria-hidden="true"></i>
+                                        </a>
+                                    </div>
+                                }
+                            </div>
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (User.IsAdministrator() || User.HasCRUDAccess())
+    {
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-dark ml-0 mb-2" data-modal="create-edit-modal"
+                data-url="@Url.Page("/BoardMeeting/BoardMeetings","FetchCreateBoardMeetingPartial")">
+            <small class="text-success">Create Board Meeting <i class="fa fa-plus" aria-hidden="true"></i></small>
+        </button>
+    }
+
+    <pagination x-pagination-dto="Model.XPaginationDto" route-url="/BoardMeetings"></pagination>
+    <page-size x-pagination-dto="Model.XPaginationDto"></page-size>
+
+    <div class="deleteItem" hidden>
+        <p>You won't be able to undo this!</p>
+        <form class="deleteForm" asp-page="/BoardMeeting/BoardMeetings" asp-page-handler="DeleteMeeting" method="post">
+            <input id="deleteId" type="hidden" asp-for="Id" />
+        </form>
+    </div>
+
+    <div class="deleteRelatedItem" hidden>
+        <p>You won't be able to undo this!</p>
+        <form class="deleteForm" asp-page="/BoardMeeting/BoardMeetings" asp-page-handler="DeleteMeetingMinute" method="post">
+            <input id="deleteId" type="hidden" asp-for="Id" />
+        </form>
+    </div>
+}
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css" />
+}
+
+@section Scripts {
+    <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
+
+    @*initialize bootstrap tooltips and ensure they are configured to only work on hover
+        if trigger: hover is not enabled, button will be focused and tooltip won't dissapear after button click*@
+    <script type="text/javascript">
+        $(function () {
+
+            //initialize data table for board meetings
+            $('#sort-table').DataTable({
+                "paging": false,
+                "info": false
+            });
+
+            function isTouchDevice() {
+                return true == ("ontouchstart" in window || window.DocumentTouch && document instanceof DocumentTouch);
+            }
+
+            if (isTouchDevice() === false) {
+                $('[data-toggle="tooltip"]').tooltip({
+                    trigger: 'hover'
+                })
+            }
+
+        })
+    </script>
+}

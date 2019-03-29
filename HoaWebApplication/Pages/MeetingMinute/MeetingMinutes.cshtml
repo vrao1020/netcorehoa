@@ -1,0 +1,7 @@
+﻿@page "/MeetingMinutes/{pageNum:int?}"
+@model MeetingMinutesModel
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}

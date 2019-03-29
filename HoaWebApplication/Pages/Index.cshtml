@@ -1,0 +1,76 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<cache expires-sliding="@TimeSpan.FromDays(1)">
+    <div class="jumbotron">
+        <h1 class="display-4 text-light">Generic Hill</h1>
+        <p class="lead text-light">Welcome to Generic HOA! We are a small, friendly community located somewhere.</p>
+        <hr class="my-4">
+        <p class="text-light">If you need to contact the board, please log in.</p>
+    </div>
+</cache>
+
+@if (TempData["TooManyRequests"] != null)
+{
+    <div class="alert alert-danger">@TempData["TooManyRequests"]</div>
+}
+else if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+else
+{
+    @if (Model.UserRegistered)
+    {
+        <div id="userregistered"></div>
+    }
+    @if (Model.ForgotPassword)
+    {
+        <div id="forgotpassword"></div>
+    }
+    @if (Model.PasswordReset)
+    {
+        <div id="passwordreset"></div>
+    }
+
+    <div id="timer-card" class="card mb-4 w-50 ml-auto mr-auto">
+        <div class="card-body bg-dark">
+            <h3 class="text-center text-light">Next Board Meeting:</h3>
+            <p class="timer-body text-center h4 text-light"></p>
+        </div>
+    </div>
+
+    <div class="row mb-2">
+        <div class="col-lg-4 col-md-12 d-flex flex-column">
+            <h5 class="text-center border bg-dark text-light mb-0 p-2">Latest Board Meeting</h5>
+            <vc:board-meeting></vc:board-meeting>
+        </div>
+        <div class="col-lg-4 col-md-12 d-flex flex-column">
+            <h5 class="text-center border bg-dark text-light mb-0 p-2">Latest Event</h5>
+            <vc:event></vc:event>
+        </div>
+        <div class="col-lg-4 col-md-12 d-flex flex-column">
+            <h5 class="text-center border bg-dark text-light mb-0 p-2">Latest Post</h5>
+            <vc:latest-post></vc:latest-post>
+        </div>
+    </div>
+}
+<div class="card mt-4 w-75 ml-auto mr-auto" id="hoainformation">
+    <h4 class="card-header bg-dark text-light">Information</h4>
+    <div class="card-body">
+        <ul>
+            <li class="fa-info-icon mb-2"><a asp-page="/Index" asp-page-handler="Download" asp-route-filename="Bylaws_Generic_HOA.pdf" class="h5 text-primary">HOA Bylaws</a></li>
+            <li class="fa-info-icon mb-2"><a asp-page="/Info/BoardMembers" class="h5 text-primary">Board Member List</a></li>
+            <li class="fa-info-icon mb-2"><a href="#" class="h5 text-primary">Misc</a></li>
+        </ul>
+
+    </div>
+</div>
+
+@if (Model.UserCreated)
+{
+    <div id="user-created"></div>
+}

@@ -1,0 +1,38 @@
+﻿@using HoaWebApplication.Pages.Post.Comment
+@model CommentsModel
+
+@if (TempData["TooManyRequests"] != null)
+{
+    <br />
+    <div class="alert alert-danger">@TempData["TooManyRequests"]</div>
+}
+else if (TempData["Error"] != null)
+{
+    <br />
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+else
+{
+    <form class="vn" asp-page="/Post/Comment/Comments" asp-page-handler="@(Model.EditComment ? "EditComment" : "CreateComment")">
+        @**Below hidden input field is required because the AJAX post requires something
+            to verify if the submission was successful*@
+        <input name="IsValid" type="hidden" value="@ViewData.ModelState.IsValid.ToString()" />
+
+        @if (Model.EditComment)
+        {
+            <input type="hidden" asp-for="Id" value="@Model?.CommentForView.Id" />
+            <input type="hidden" asp-for="PostId" value="@Model?.PostId" />
+        }
+        else
+        {
+            <input type="hidden" asp-for="PostId" value="@Model?.PostId" />
+        }
+
+        <div class="form-group">
+            <label asp-for="CommentToCreateEdit.Message" class="control-label"></label>
+            <textarea asp-for="CommentToCreateEdit.Message" class="form-control" id="tinymcetextarea"></textarea>
+            <input type="hidden" id="text-area-content" value="@(Model.EditComment ? Model.CommentForView.Message : Model?.CommentToCreateEdit.Message)" />
+            <span asp-validation-for="CommentToCreateEdit.Message" class="text-danger"></span>
+        </div>
+    </form>
+}

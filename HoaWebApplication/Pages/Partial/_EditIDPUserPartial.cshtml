@@ -1,0 +1,35 @@
+﻿@using HoaWebApplication.Pages.Admin
+@model IDPUsersModel
+
+<form class="vn" asp-page="/Admin/IDPUsers" asp-page-handler="EditIDPUser">
+    @**Below hidden input field is required because the AJAX post requires something
+        to verify if the submission was successful*@
+    <input name="IsValid" type="hidden" value="@ViewData.ModelState.IsValid.ToString()" />
+
+    <input type="hidden" asp-for="UserToEdit.Id" value="@Model.UserToEdit.Id" />
+    <div class="form-group">
+        <label asp-for="ReadOnlyAccess" class="control-label"></label>
+        <select class="custom-select" asp-for="ReadOnlyAccess">
+            <option selected=@(Model.ReadOnlyAccess ? "selected" : null) value="true">Yes</option>
+            <option selected=@(!Model.ReadOnlyAccess ? "selected" : null) value="false">No</option>
+        </select>
+        <span asp-validation-for="ReadOnlyAccess" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Role" class="control-label"></label>
+        <select class="custom-select" asp-for="Role">
+            <option selected=@(Model.Role == "admin" ? "selected" : null) value="admin">Admin</option>
+            <option selected=@(Model.Role == "board" ? "selected" : null) value="board">Board</option>
+            <option selected=@(Model.Role == "user" ? "selected" : null) value="user">User</option>
+        </select>
+        <span asp-validation-for="Role" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="PostAccess" class="control-label"></label>
+        <select class="custom-select" asp-for="PostAccess">
+            <option selected=@(Model.PostAccess ? "selected" : null) value="true">Yes</option>
+            <option selected=@(!Model.PostAccess ? "selected" : null) value="false">No</option>
+        </select>
+        <span asp-validation-for="PostAccess" class="text-danger"></span>
+    </div>
+</form>

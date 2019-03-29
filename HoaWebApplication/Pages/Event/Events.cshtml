@@ -1,0 +1,101 @@
+﻿@page "/Events/{pageNum:int?}"
+@model EventsModel
+@{
+    ViewData["Title"] = "Events";
+}
+
+@if (TempData["TooManyRequests"] != null)
+{
+    <div class="alert alert-danger">@TempData["TooManyRequests"]</div>
+}
+else if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+else
+{
+    <h1 class="display-4 text-primary bottom-border">Events</h1>
+
+    @*initialize local variable to store user is so that its not fetched repeatedly*@
+    <span>@{var id = User?.GetUserId(); }</span>
+
+    @foreach (var item in Model.eventsForView)
+    {
+        <div class="row mb-2">
+            <div class="col">
+                <div class="card flex-md-row mb-4 box-shadow shadow-sm">
+                    <img class="card-img-left flex-auto d-lg-block align-self-center" src="https://via.placeholder.com/200" alt="Card image cap">
+                    <div class="card-body d-flex flex-column align-items-start">
+                        <div class="d-flex flex-row">
+                            <h4 class="mb-0">
+                                @item.Title
+                            </h4>
+                            <div class="mt-auto ml-1">
+
+                                @if ((User.Identity.IsAuthenticated) && (Model.UserIsAdmin || (User?.IsObjectOwner(id, item.OwnerSocialId) ?? false)))
+                                {
+                                    <div>
+                                        <a class="text-dark show-cursor"
+                                           data-toggle="tooltip" data-placement="top" title="Edit Event"
+                                           data-modal="create-edit-modal"
+                                           data-url="@Url.Page("Events","FetchEditEventPartial", new {Id = item.Id})">
+                                            <i class="fa fa-pencil-square-o" aria-label="Edit" aria-hidden="true"></i>
+                                        </a>
+                                        <a class="text-danger show-cursor"
+                                           data-toggle="tooltip" data-placement="top" title="Delete Event"
+                                           data-modal="delete-modal"
+                                           data-id="@item.Id">
+                                            <i class="fa fa-trash" aria-label="Delete" aria-hidden="true"></i>
+                                        </a>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <div class="mb-1 text-success w-100 border-bottom mb-2">Scheduled: @(item.ScheduledTime.ToString("MMMM dd, yyyy hh:mm tt", CultureInfo.InvariantCulture))</div>
+                        <div class="card-text mb-auto dont-break-out">@Html.Raw(@item.Message)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (User.IsAdministrator() || User.HasCRUDAccess())
+    {
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-dark ml-0 mb-2 create-edit-button" data-modal="create-edit-modal"
+                data-url="@Url.Page("/Event/Events", "FetchCreateEventPartial")">
+            <small class="text-success">Create Event <i class="fa fa-plus" aria-hidden="true"></i></small>
+        </button>
+    }
+
+
+    <pagination x-pagination-dto="Model.XPaginationDto" route-url="/Events"></pagination>
+    <page-size x-pagination-dto="Model.XPaginationDto"></page-size>
+
+    <div class="deleteItem" hidden>
+        <p>You won't be able to undo this!</p>
+        <form class="deleteForm" asp-page="/Event/Events" asp-page-handler="DeleteEvent" method="post">
+            <input id="deleteId" type="hidden" asp-for="Id" />
+        </form>
+    </div>
+}
+
+@section Scripts {
+    @*initialize bootstrap tooltips and ensure they are configured to only work on hover
+        if trigger: hover is not enabled, button will be focused and tooltip won't dissapear after button click*@
+    <script type="text/javascript">
+        $(function () {
+
+            function isTouchDevice() {
+                return true == ("ontouchstart" in window || window.DocumentTouch && document instanceof DocumentTouch);
+            }
+
+            if (isTouchDevice() === false) {
+                $('[data-toggle="tooltip"]').tooltip({
+                    trigger: 'hover'
+                })
+            }
+
+        })
+    </script>
+}

@@ -1,0 +1,12 @@
+﻿@model IEnumerable<string>
+
+<ul>
+    @foreach (var item in Model)
+    {
+        <li>
+            <a asp-page="/MeetingMinute/MeetingMinutes" asp-page-handler="Download" asp-route-filename="@item">
+                @item
+            </a>
+        </li>
+    }
+</ul>

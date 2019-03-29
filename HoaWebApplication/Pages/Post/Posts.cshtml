@@ -1,0 +1,110 @@
+﻿@page "/Posts/{pageNum:int?}"
+@model PostsModel
+@{
+    ViewData["Title"] = "Posts";
+}
+
+@if (TempData["TooManyRequests"] != null)
+{
+    <div class="alert alert-danger">@TempData["TooManyRequests"]</div>
+}
+else if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+else
+{
+    <h1 class="display-4 text-primary bottom-border">Posts</h1>
+
+    @*initialize local variable to store user is so that its not fetched repeatedly*@
+    <span>@{var id = User?.GetUserId(); }</span>
+
+    @foreach (var item in Model.posts)
+    {
+        <div class="row mb-2">
+            <div class="col">
+                <div class="card flex-md-row mb-4 box-shadow shadow-sm">
+                    <div class="card-body d-flex flex-column align-items-start">
+                        <div class="d-flex flex-row">
+                            <h4 class="mb-0">
+                                <a class="text-primary" asp-page="/Post/Comment/Comments" asp-route-postid="@item.Id">@item.Title</a>
+                            </h4>
+                            <div class="mt-auto ml-1">
+                                @if ((User.Identity.IsAuthenticated) && (Model.UserIsAdmin || (User?.IsObjectOwner(id, item.OwnerSocialId) ?? false)))
+                                {
+                                    <div>
+                                        <a class="text-dark show-cursor"
+                                           data-toggle="tooltip" data-placement="top" title="Edit Post"
+                                           data-modal="create-edit-modal"
+                                           data-url="@Url.Page("/Post/Posts","FetchEditPostPartial", new {Id = item.Id})">
+                                            <i class="fa fa-pencil-square-o" aria-label="Edit" aria-hidden="true"></i>
+                                        </a>
+                                        <a class="text-danger show-cursor"
+                                           data-toggle="tooltip" data-placement="top" title="Delete Post"
+                                           data-modal="delete-modal"
+                                           data-id="@item.Id">
+                                            <i class="fa fa-trash" aria-label="Delete" aria-hidden="true"></i>
+                                        </a>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        @if (item.Important == true)
+                        {
+                            <div class="mb-1 badge badge-danger">Important!</div>
+                            <div class="border-bottom w-100"></div>
+                        }
+                        else
+                        {
+                            <div class="border-bottom w-100"></div>
+                        }
+                        <div class="card-text mb-auto dont-break-out">@Html.Raw(@item.Message)</div>
+                        <a class="badge badge-dark btn-sm" asp-page="/Post/Comment/Comments" asp-route-postid="@item.Id">
+                            # Comments <span class="badge badge-light">@item.NumberOfComments</span>
+                            <span class="sr-only"><small>number of comments</small></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (User.IsAdministrator() || User.HasPostCreationAccess())
+    {
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-dark ml-0 mb-2 create-edit-button" data-modal="create-edit-modal"
+                data-url="@Url.Page("/Post/Posts","FetchCreatePostPartial")">
+            <small class="text-success">Create Post <i class="fa fa-plus" aria-hidden="true"></i></small>
+        </button>
+    }
+
+    <pagination x-pagination-dto="Model.XPaginationDto" route-url="/Posts"></pagination>
+    <page-size x-pagination-dto="Model.XPaginationDto"></page-size>
+
+    <div class="deleteItem" hidden>
+        <p>You won't be able to undo this!</p>
+        <form class="deleteForm" asp-page="/Post/Posts" asp-page-handler="DeletePost" method="post">
+            <input id="deleteId" type="hidden" asp-for="Id" />
+        </form>
+    </div>
+}
+
+@section Scripts {
+    @*initialize bootstrap tooltips and ensure they are configured to only work on hover
+        if trigger: hover is not enabled, button will be focused and tooltip won't dissapear after button click*@
+    <script type="text/javascript">
+        $(function () {
+
+            function isTouchDevice() {
+                return true == ("ontouchstart" in window || window.DocumentTouch && document instanceof DocumentTouch);
+            }
+
+            if (isTouchDevice() === false) {
+                $('[data-toggle="tooltip"]').tooltip({
+                    trigger: 'hover'
+                })
+            }
+
+        })
+    </script>
+}

@@ -1,0 +1,29 @@
+﻿@using HoaWebApplication.Pages.Contact
+@model ContactAdminModel
+
+@if (TempData["Error"] != null)
+{
+    <br />
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+else
+{
+    <form class="vn" asp-page="/Contact/ContactAdmin" asp-page-handler="AdminEmail">
+        @**Below hidden input field is required because the AJAX post requires something
+            to verify if the submission was successful*@
+        <input name="IsValid" type="hidden" value="@ViewData.ModelState.IsValid.ToString()" />
+        <div class="contact-board"></div>
+        <input type="hidden" asp-for="EmailProperties.Name" value="@(User?.Identity.Name ?? "Unknown User")" />
+        <div class="form-group">
+            <label asp-for="EmailProperties.Subject" class="control-label"></label>
+            <input asp-for="EmailProperties.Subject" class="form-control" placeholder="Email Subject" />
+            <span asp-validation-for="EmailProperties.Subject" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="EmailProperties.Message" class="control-label"></label>
+            <textarea asp-for="EmailProperties.Message" class="form-control" id="tinymcetextarea"></textarea>
+            <input type="hidden" id="text-area-content" />
+            <span asp-validation-for="EmailProperties.Message" class="text-danger"></span>
+        </div>
+    </form>
+}

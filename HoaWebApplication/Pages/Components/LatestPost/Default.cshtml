@@ -1,0 +1,51 @@
+﻿@model PostViewDto
+
+@if (Model?.Title != null)
+{
+    <div class="card flex-md-row box-shadow shadow-sm p-1 flex-grow-1 mb-4">
+        <div class="card-body d-flex flex-column align-items-start">
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger">@TempData["Error"]</div>
+            }
+            else
+            {
+                <div class="d-flex flex-row">
+                    <h4 class="mb-0 dont-break-out text-primary">
+                        <a asp-page="/Post/Comment/Comments" asp-route-postid="@Model.Id">@Model.Title</a>
+                    </h4>
+                </div>
+                @if (Model.Important == true)
+                {
+                    <div class="mb-1 badge badge-danger">Important!</div>
+                    <div class="border-bottom w-100"></div>
+                }
+                else
+                {
+                    <div class="border-bottom w-100"></div>
+                }
+                <div class="card-text mb-auto dont-break-out">@Html.Raw(Model.Message)</div>
+                <div class="badge badge-dark btn-sm">
+                    # Comments <span class="badge badge-light">@Model.NumberOfComments</span>
+                    <span class="sr-only">number of comments</span>
+                </div>
+            }
+        </div>
+    </div>
+}
+else
+{
+    <div class="card flex-row mb-4 box-shadow shadow-sm h-100">
+        <div class="card-body d-flex flex-column align-items-start">
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger d-flex flex-row">@TempData["Error"]</div>
+            }
+            else
+            {
+                <h4>No Posts Exist</h4>
+                <div class="mb-1 text-muted w-100 border-bottom mb-2 mt-auto">Be the first to post something!</div>
+            }
+        </div>
+    </div>
+}

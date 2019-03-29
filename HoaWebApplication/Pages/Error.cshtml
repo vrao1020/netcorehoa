@@ -1,0 +1,21 @@
+﻿@page
+@model ErrorModel
+@{
+    ViewData["Title"] = "Error";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div id="notfound">
+            <div class="notfound">
+                <div class="notfound-404">
+                    <h1 class="text-danger">500</h1>
+                </div>
+                <h2>Internal Server Error</h2>
+                <p>An error ocurred while processing your request. Please try again later or send the admin an email.</p>
+                <a asp-page="/Index">Back To Homepage</a>
+            </div>
+        </div>
+    </div>
+</div>
+

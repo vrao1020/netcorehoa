@@ -1,0 +1,62 @@
+﻿@page
+@model HoaWebApplication.Pages.Account.ProfileModel
+@{
+    ViewData["Title"] = "User Profile";
+}
+
+@if (TempData["UserProfileUpdate"] != null)
+{
+    <div class="alert alert-success">@TempData["UserProfileUpdate"]</div>
+}
+@if (TempData["TooManyRequests"] != null)
+{
+    <div class="alert alert-danger">@TempData["TooManyRequests"]</div>
+}
+
+<p>Your Name and Email are automatically synced from your login.</p>
+<hr />
+
+
+<h1 class="display-4 text-primary bottom-border">Profile</h1>
+
+<form method="post">
+    <div class="form-group">
+        <div class="col-md-10">
+            <label asp-for="UserToUpdate.Email" class="control-label"></label>
+            @**Note that razor code only works in tag helpers when used on an attribute
+                It will not work when trying to assign an attribute (i.e. if you do something
+                 like @Model.IsTrue ? "readonly" : ""). You have to assign it to an attribute
+            *@
+            <input readonly=@((Model.ValidEmail) ? "readonly" : null) asp-for="UserToUpdate.Email" value="@Model.UserDetails.Email" class="form-control" />
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-10">
+            <label asp-for="UserToUpdate.FirstName" class="control-label"></label>
+            <input readonly="readonly" asp-for="UserToUpdate.FirstName" value="@Model.UserDetails.FirstName" class="form-control" />
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-10">
+            <label asp-for="UserToUpdate.LastName" class="control-label"></label>
+            <input readonly="readonly" asp-for="UserToUpdate.LastName" value="@Model.UserDetails.LastName" class="form-control" />
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-10">
+            <label asp-for="UserToUpdate.Reminder" class="control-label"></label>
+            <select class="custom-select" asp-for="UserToUpdate.Reminder">
+                <option selected=@(Model.UserDetails.Reminder ? "selected" : null) value="true">Yes</option>
+                <option selected=@(!Model.UserDetails.Reminder ? "selected" : null) value="false">No</option>
+            </select>
+            <span asp-validation-for="UserToUpdate.Reminder" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-10">
+            <button type="submit" class="btn btn-dark text-light">Submit</button>
+            <input type="button" onclick="history.go(-1)" value="Go Back" class="btn btn-danger text-light" />
+        </div>
+    </div>
+</form>
+

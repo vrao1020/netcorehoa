@@ -1,0 +1,68 @@
+﻿@page "/IDPUsers/{pageNum:int?}"
+@model IDPUsersModel
+@{
+    ViewData["Title"] = "IDP Users";
+}
+
+<h1 class="display-4 text-primary bottom-border">IDP Users</h1>
+
+<table class="table table-hover table-responsive-md">
+    <thead class="thead-dark">
+        <tr>
+            <th class="text-center">Name</th>
+            <th class="text-center">Email</th>
+            <th class="text-center">Email Verified?</th>
+            <th class="text-center">Read Only Access?</th>
+            <th class="text-center">Post Access?</th>
+            <th class="text-center">Role</th>
+            <th class="text-center">Edit</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Users)
+        {
+            <tr>
+                <td class="text-center">@item.Name</td>
+                <td class="text-center">@item.Email</td>
+                <td class="text-center">@item.EmailConfirmed</td>
+                <td class="text-center">@item.ReadOnly</td>
+                <td class="text-center">@item.PostCreation</td>
+                <td class="text-center">@item.Role</td>
+                <td class="text-center">
+                    <a class="text-dark show-cursor"
+                       data-toggle="tooltip" data-placement="top" title="Edit IDP User"
+                       data-modal="create-edit-modal"
+                       data-url="@Url.Page("IDPUsers","FetchEditIDPUsersPartial", new {Id = item.Id,
+                                 ReadOnlyAccess = (item.ReadOnly == "true" ? true : false),
+                                 Role = item.Role,
+                                 PostAccess = (item.PostCreation == "true" ? true : false)})">
+                        <i class="fa fa-pencil-square-o" aria-label="Edit" aria-hidden="true"></i>
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<pagination x-pagination-dto="Model.XPaginationDto" route-url="/IDPUsers"></pagination>
+<page-size x-pagination-dto="Model.XPaginationDto"></page-size>
+
+@section Scripts {
+    @*initialize bootstrap tooltips and ensure they are configured to only work on hover
+        if trigger: hover is not enabled, button will be focused and tooltip won't dissapear after button click*@
+    <script type="text/javascript">
+        $(function () {
+
+            function isTouchDevice() {
+                return true == ("ontouchstart" in window || window.DocumentTouch && document instanceof DocumentTouch);
+            }
+
+            if (isTouchDevice() === false) {
+                $('[data-toggle="tooltip"]').tooltip({
+                    trigger: 'hover'
+                })
+            }
+
+        })
+    </script>
+}

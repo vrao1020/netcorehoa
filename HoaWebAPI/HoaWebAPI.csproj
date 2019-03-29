@@ -1,0 +1,62 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <Platforms>AnyCPU;x86</Platforms>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile></DocumentationFile>
+    <NoWarn>1701;1702</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Extensions\Authorization\**" />
+    <Compile Remove="wwwroot\**" />
+    <Content Remove="Extensions\Authorization\**" />
+    <Content Remove="wwwroot\**" />
+    <EmbeddedResource Remove="Extensions\Authorization\**" />
+    <EmbeddedResource Remove="wwwroot\**" />
+    <None Remove="Extensions\Authorization\**" />
+    <None Remove="wwwroot\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AspNetCoreRateLimit" Version="3.0.3" />
+    <PackageReference Include="AutoMapper" Version="8.0.0" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="FluentValidation" Version="8.2.0" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="8.2.0" />
+    <PackageReference Include="Marvin.Cache.Headers" Version="3.1.0" />
+    <PackageReference Include="MicroElements.Swashbuckle.FluentValidation" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Api.Analyzers" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.3" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Redis" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.AzureKeyVault" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="2.2.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
+    <PackageReference Include="Serilog.AspNetCore" Version="2.1.1" />
+    <PackageReference Include="Serilog.Sinks.AzureBlobStorage" Version="1.2.3" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+    <PackageReference Include="Serilog.Sinks.Debug" Version="1.0.1" />
+    <PackageReference Include="Sieve" Version="2.3.2" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\HoaCommon\HoaCommon.csproj" />
+    <ProjectReference Include="..\HoaEntities\HoaEntities.csproj" />
+    <ProjectReference Include="..\HoaInfrastructure\HoaInfrastructure.csproj" />
+  </ItemGroup>
+  
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <DocumentationFile>SwaggerComments.xml</DocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <LangVersion>latest</LangVersion>
+    <UserSecretsId>338fcb14-a2ff-4f85-ae61-680d9b2f6db1</UserSecretsId>
+  </PropertyGroup>
+
+</Project>

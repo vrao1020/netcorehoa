@@ -1,0 +1,31 @@
+﻿@using HoaWebApplication.Pages.BoardMeeting
+@model BoardMeetingsModel
+
+@if (TempData["TooManyRequests"] != null)
+{
+    <br />
+    <div class="alert alert-danger">@TempData["TooManyRequests"]</div>
+}
+else if (TempData["Error"] != null)
+{
+    <br />
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+else
+{
+    <form class="vn" asp-page="/BoardMeeting/BoardMeetings" asp-page-handler="UploadMeetingMinute" enctype="multipart/form-data">
+        <p class="alert alert-info">Uploading a new file will replace the old one</p>
+        @**Below hidden input field is required because the AJAX post requires something
+            to verify if the submission was successful*@
+        <input name="IsValid" type="hidden" value="@ViewData.ModelState.IsValid.ToString()" />
+        <input type="hidden" asp-for="Id" value="@Model.Id" />
+        <div class="custom-file">
+            <input asp-for="FileUploaded.FileToUpload" type="file" class="custom-file-input" accept=".doc,.docx,.txt,.pdf" aria-describedby="helptext" id="customFile" /><br />
+            <label class="custom-file-label" for="customFile">Choose file</label>
+            <span asp-validation-for="FileUploaded.FileToUpload" class="text-danger"></span>
+            <small id="helptext" class="form-text text-muted">
+                File must be a word, pdf, or text document. File size must be smaller than 5MB.
+            </small>
+        </div>
+    </form>
+}
