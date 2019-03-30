@@ -20,6 +20,8 @@ NuGet packages and change the service configuration.
 # Running the application
 - Set multiple project startup - HoaIdentityServer, HoaIdentityUsers, HoaWebAPI, HoaWebApplication
 
+#Login
+- Default local login is abc@123.com / Pass123$
 
 # Functionality
 - Login
